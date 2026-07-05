@@ -220,6 +220,54 @@ Les communications entre services passent uniquement par des API REST.
 
 ---
 
+# Architecture du projet ressemblera a ceci 
+
+E-COMMERCE-MICROSERVICES
+│
+├── api-gateway
+│   ├── pom.xml
+│   ├── Dockerfile
+│   ├── src
+│   └── ...
+│
+├── user-service
+│   ├── pom.xml
+│   ├── Dockerfile
+│   ├── src
+│   └── ...
+│
+├── catalog-service
+│   ├── pom.xml
+│   ├── Dockerfile
+│   ├── src
+│   └── ...
+│
+├── order-service
+│   ├── pom.xml
+│   ├── Dockerfile
+│   ├── src
+│   └── ...
+│
+├── payment-service
+│   ├── pom.xml
+│   ├── Dockerfile
+│   ├── src
+│   └── ...
+│
+├── frontend-angular
+│   ├── package.json
+│   ├── angular.json
+│   ├── src
+│   └── ...
+│
+├── docs
+│
+├── docker-compose.yml
+│
+└── README.md
+
+---
+
 # 🔄 Flux de communication
 
 ```
@@ -248,6 +296,30 @@ User         Catalog
         ▼
     Payment
 ```
+
+---
+
+# Branche attendu dans le projet.
+
+main
+
+develop
+
+feature/user-service
+
+feature/catalog-service
+
+feature/order-service
+
+feature/payment-service
+
+feature/frontend
+
+Adama travaille sur feature/user-service
+Aissatou sur feature/catalog-service
+Arame sur feature/order-service
+Racine sur feature/payment-service
+Abdoulaye sur feature/frontend
 
 ---
 
