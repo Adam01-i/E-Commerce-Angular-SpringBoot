@@ -361,6 +361,8 @@ E-COMMERCE-MICROSERVICES
 
 ---
 
+
+
 # 🛠️ Technologies utilisées
 
 ## Backend
@@ -436,62 +438,47 @@ de son microservice.
 
 ---
 
-# 🚀 Organisation du développement
+# 🐳 Stratégie de développement avec Docker
 
-Le projet sera développé selon les étapes suivantes :
+Afin de garantir un environnement de développement identique pour tous les membres de l'équipe, le projet sera conteneurisé dès le début du développement.
 
-## Phase 1
+Chaque microservice disposera de son propre **Dockerfile**, tandis qu'un unique fichier **docker-compose.yml** situé à la racine du projet permettra de lancer l'ensemble de l'architecture (API Gateway, microservices, bases de données PostgreSQL et Frontend Angular).
 
-- Création des projets
-- Docker
-- PostgreSQL
-- Architecture
+Tous les services communiqueront via un **réseau interne Docker** en utilisant le nom des conteneurs (ex. `http://catalog-service:8082`) plutôt que des adresses IP ou `localhost`.
 
----
+Cette approche garantit :
 
-## Phase 2
+- Un environnement identique pour tous les développeurs.
+- Une intégration simplifiée entre les microservices.
+- Une configuration centralisée grâce à Docker Compose.
+- Un déploiement rapide de toute l'application avec une seule commande :
 
-Développement indépendant de chaque microservice.
+```bash
+docker compose up -d
+```
 
-Chaque membre travaille sur son service.
-
----
-
-## Phase 3
-
-Communication entre microservices.
-
-- OpenFeign
-- JWT
-- API Gateway
+L'ensemble du projet sera donc développé, testé et intégré directement dans son environnement Docker afin d'éviter les problèmes de configuration lors de la phase finale d'intégration.
 
 ---
 
-## Phase 4
+## 🌐 Ports utilisés par les services
 
-Développement complet du Frontend Angular.
+Afin d'éviter les conflits de ports et de faciliter le développement, chaque service de l'architecture dispose de son propre port.
 
-Connexion avec les APIs.
+| Service | Port | Description |
+|---------|:----:|-------------|
+| **API Gateway** | **8080** | Point d'entrée unique de toutes les requêtes du Frontend vers les microservices. |
+| **User Service** | **8081** | Gestion des utilisateurs, de l'authentification et de l'autorisation (JWT). |
+| **Catalog Service** | **8082** | Gestion des produits, catégories, stocks et prix de gros. |
+| **Order Service** | **8083** | Gestion des paniers, commandes et factures. |
+| **Payment Service** | **8084** | Gestion des paiements et validation des transactions. |
+| **Frontend Angular** | **4200** | Interface utilisateur de l'application E-Commerce. |
+| **PostgreSQL - User** | **5433** | Base de données dédiée au **User Service** (port exposé sur la machine hôte). |
+| **PostgreSQL - Catalog** | **5434** | Base de données dédiée au **Catalog Service** (port exposé sur la machine hôte). |
+| **PostgreSQL - Order** | **5435** | Base de données dédiée au **Order Service** (port exposé sur la machine hôte). |
+| **PostgreSQL - Payment** | **5436** | Base de données dédiée au **Payment Service** (port exposé sur la machine hôte). |
 
----
-
-## Phase 5
-
-Tests complets
-
-- Tests unitaires
-- Tests d'intégration
-- Tests fonctionnels
-
----
-
-## Phase 6
-
-Préparation de la soutenance.
-
-- démonstration
-- documentation
-- présentation
+> **Remarque :** À l'intérieur du réseau Docker, chaque conteneur PostgreSQL continue d'utiliser son port standard **5432**. Les ports **5433**, **5434**, **5435** et **5436** sont uniquement exposés sur la machine hôte afin de permettre l'accès aux bases de données via des outils comme **DBeaver**, **pgAdmin** ou **IntelliJ IDEA**.
 
 ---
 
