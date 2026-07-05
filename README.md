@@ -218,10 +218,82 @@ Aucune base n'est partagée.
 
 Les communications entre services passent uniquement par des API REST.
 
+# 🔄 Flux de communication
+
+```
+Utilisateur
+
+        │
+
+Frontend Angular
+
+        │
+
+API Gateway
+
+        │
+
+ ├───────────────┐
+ │               │
+ │               │
+ ▼               ▼
+User         Catalog
+ │               │
+ └──────┐   ┌────┘
+        ▼   ▼
+      Order
+        │
+        ▼
+    Payment
+```
+
 ---
 
-# Architecture du projet ressemblera a ceci 
+# 🌿 Branches Git du projet
 
+Afin de faciliter le travail collaboratif, chaque membre développera ses fonctionnalités sur une branche dédiée avant leur fusion dans les branches principales.
+
+## Structure des branches
+
+```text
+main
+develop
+
+feature/user-service
+feature/catalog-service
+feature/order-service
+feature/payment-service
+feature/frontend
+```
+
+## Répartition des branches
+
+| Membre | Branche |
+|---------|----------|
+| **Adama Seck** | `feature/user-service` |
+| **Aissatou Diagne** | `feature/catalog-service` |
+| **Arame Bacar Cissé** | `feature/order-service` |
+| **Racine Sabaly** | `feature/payment-service` |
+| **Abdoulaye Niang** | `feature/frontend` |
+
+### Workflow Git
+
+Chaque membre devra :
+
+1. Créer sa branche à partir de `develop`.
+2. Développer ses fonctionnalités.
+3. Effectuer des commits réguliers.
+4. Pousser ses modifications sur GitHub.
+5. Fusionner sa branche dans `develop` après validation.
+6. Une fois toutes les fonctionnalités validées, la branche `develop` sera fusionnée dans `main`.
+
+---
+
+# 🏗️ Architecture générale du projet
+
+L'organisation du dépôt Git sera la suivante :
+
+```text
 E-COMMERCE-MICROSERVICES
 │
 ├── api-gateway
@@ -265,61 +337,27 @@ E-COMMERCE-MICROSERVICES
 ├── docker-compose.yml
 │
 └── README.md
-
----
-
-# 🔄 Flux de communication
-
-```
-Utilisateur
-
-        │
-
-Frontend Angular
-
-        │
-
-API Gateway
-
-        │
-
- ├───────────────┐
- │               │
- │               │
- ▼               ▼
-User         Catalog
- │               │
- └──────┐   ┌────┘
-        ▼   ▼
-      Order
-        │
-        ▼
-    Payment
 ```
 
----
+## 📂 Description de l'architecture
 
-# Branche attendu dans le projet.
+- **api-gateway** : Point d'entrée unique de l'application. Toutes les requêtes du Frontend transitent par cette passerelle avant d'être redirigées vers le microservice concerné.
 
-main
+- **user-service** : Gère les utilisateurs, l'authentification, l'autorisation, les rôles, les profils ainsi que la sécurité basée sur JWT.
 
-develop
+- **catalog-service** : Gère les produits, les catégories, les stocks, les images et les prix de gros.
 
-feature/user-service
+- **order-service** : Gère le panier, les commandes, les factures et la communication avec les autres microservices pour le traitement des achats.
 
-feature/catalog-service
+- **payment-service** : Gère les paiements, la validation des transactions et la mise à jour des statuts des commandes.
 
-feature/order-service
+- **frontend-angular** : Application Angular consommant les API exposées via l'API Gateway.
 
-feature/payment-service
+- **docs** : Contient l'ensemble de la documentation du projet (cahier des charges, diagrammes UML, captures d'écran, documentation technique, etc.).
 
-feature/frontend
+- **docker-compose.yml** : Permet de lancer l'ensemble des services (microservices, bases PostgreSQL, API Gateway et Frontend) à l'aide d'une seule commande Docker Compose.
 
-Adama travaille sur feature/user-service
-Aissatou sur feature/catalog-service
-Arame sur feature/order-service
-Racine sur feature/payment-service
-Abdoulaye sur feature/frontend
+- **README.md** : Documentation principale du projet expliquant son architecture, son fonctionnement et les consignes de développement.
 
 ---
 
