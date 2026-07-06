@@ -5,8 +5,13 @@ import com.ecommerce.order_service.dto.CreerCommandeRequest;
 import com.ecommerce.order_service.dto.LigneCommandeDTO;
 import com.ecommerce.order_service.entity.*;
 import com.ecommerce.order_service.exception.RessourceNonTrouveeException;
+import com.ecommerce.order_service.feign.CatalogClient;
+import com.ecommerce.order_service.feign.InitierPaiementRequest;
+import com.ecommerce.order_service.feign.PaiementResponseDTO;
+import com.ecommerce.order_service.feign.PaymentClient;
 import com.ecommerce.order_service.repository.CommandeRepository;
 import com.ecommerce.order_service.repository.PanierRepository;
+import com.ecommerce.order_service.repository.ReservationStockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +28,9 @@ public class CommandeService {
 
     private final CommandeRepository commandeRepository;
     private final PanierRepository panierRepository;
+    private final ReservationStockRepository reservationStockRepository;
+    private final CatalogClient catalogClient;
+    private final PaymentClient paymentClient;
 
     @Transactional
     public CommandeDTO creerCommande(CreerCommandeRequest request) {
@@ -33,6 +41,7 @@ public class CommandeService {
             throw new IllegalStateException("Le panier est vide, impossible de créer une commande");
         }
 
+        // 1. Créer la commande en EN_ATTENTE
         Commande commande = new Commande();
         commande.setNumeroCommande("CMD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         commande.setUtilisateurId(request.getUtilisateurId());
@@ -59,9 +68,35 @@ public class CommandeService {
 
         Commande sauvegardee = commandeRepository.save(commande);
 
-        // Vider le panier après validation de la commande
+        // 2. Réserver le stock pour chaque ligne (appel Catalog + trace locale)
+        for (LigneCommande ligne : lignes) {
+            catalogClient.verifierDisponibilite(ligne.getProduitId()); // vérif simple ici
+
+            ReservationStock reservation = new ReservationStock();
+            reservation.setCommandeId(sauvegardee.getId());
+            reservation.setProduitId(ligne.getProduitId());
+            reservation.setQuantite(ligne.getQuantite());
+            reservation.setDateReservation(LocalDateTime.now());
+            reservation.setExpiree(false);
+            reservationStockRepository.save(reservation);
+        }
+
+        // 3. Vider le panier
         panier.getItems().clear();
         panierRepository.save(panier);
+
+        // 4. Initier le paiement auprès du Payment Service
+        InitierPaiementRequest paiementRequest = new InitierPaiementRequest(
+                sauvegardee.getId(), montantTotal, request.getModePaiement()
+        );
+        PaiementResponseDTO paiementResponse = paymentClient.initierPaiement(paiementRequest);
+
+        // 5. Mettre à jour le statut selon la réponse immédiate (simplifié ; en réalité
+        //    le vrai passage à PAYEE se fera via un callback du Payment Service)
+        if ("VALIDE".equals(paiementResponse.getStatut())) {
+            sauvegardee.setEtat(EtatCommande.PAYEE);
+            commandeRepository.save(sauvegardee);
+        }
 
         return toDTO(sauvegardee);
     }
@@ -75,6 +110,36 @@ public class CommandeService {
     public List<CommandeDTO> listerCommandesUtilisateur(Long utilisateurId) {
         return commandeRepository.findByUtilisateurId(utilisateurId)
                 .stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public List<CommandeDTO> listerToutesLesCommandes() {
+        return commandeRepository.findAll()
+                .stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public CommandeDTO modifierStatut(Long id, EtatCommande nouvelEtat) {
+        Commande commande = commandeRepository.findById(id)
+                .orElseThrow(() -> new RessourceNonTrouveeException("Commande non trouvée : " + id));
+
+        validerTransition(commande.getEtat(), nouvelEtat);
+        commande.setEtat(nouvelEtat);
+        return toDTO(commandeRepository.save(commande));
+    }
+
+    // Machine à états simple : définit les transitions autorisées
+    private void validerTransition(EtatCommande actuel, EtatCommande nouveau) {
+        boolean autorise = switch (actuel) {
+            case EN_ATTENTE -> nouveau == EtatCommande.PAYEE || nouveau == EtatCommande.ANNULEE;
+            case PAYEE -> nouveau == EtatCommande.EXPEDIEE || nouveau == EtatCommande.ANNULEE;
+            case EXPEDIEE -> nouveau == EtatCommande.LIVREE;
+            case LIVREE, ANNULEE -> false; // états finaux
+        };
+
+        if (!autorise) {
+            throw new IllegalStateException(
+                    "Transition non autorisée : " + actuel + " -> " + nouveau);
+        }
     }
 
     private CommandeDTO toDTO(Commande commande) {
