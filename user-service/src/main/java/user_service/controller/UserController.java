@@ -69,6 +69,16 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
+    @Operation(summary = "Recherche interne utilisateur")
+    @GetMapping("/internal/{id}")
+    public ResponseEntity<UserResponse> getUserInternal(
+            @PathVariable Long id
+    ){
+        return ResponseEntity.ok(
+                userService.findUserById(id)
+        );
+    }
+
     @Operation(summary = "Activer un compte utilisateur (réservé à l'administrateur)")
     @PutMapping("/{id}/activate")
     @PreAuthorize("hasRole('ADMIN')")

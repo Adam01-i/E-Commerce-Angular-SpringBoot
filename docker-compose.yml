@@ -103,6 +103,7 @@ services:
     container_name: order-service
     depends_on:
       - postgres-order
+      - user-service
     ports:
       - "8083:8083"
     environment:

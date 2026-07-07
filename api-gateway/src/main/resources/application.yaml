@@ -3,36 +3,42 @@ server:
 
 
 spring:
-
   application:
     name: api-gateway
 
-
   cloud:
-
     gateway:
+      server:
+        webmvc:
+          routes:
 
-      routes:
+            - id: user-service
+              uri: http://user-service:8081
+              predicates:
+                - Path=/api/users/**
 
-        - id: user-service
-          uri: http://user-service:8081
-          predicates:
-            - Path=/api/users/**
+            - id: catalog-service
+              uri: http://catalog-service:8082
+              predicates:
+                - Path=/api/catalog/**
+
+            - id: order-service
+              uri: http://order-service:8083
+              predicates:
+                - Path=/api/orders/**
+
+            - id: payment-service
+              uri: http://payment-service:8084
+              predicates:
+                - Path=/api/payments/**
 
 
-        - id: catalog-service
-          uri: http://catalog-service:8082
-          predicates:
-            - Path=/api/catalog/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
-
-        - id: order-service
-          uri: http://order-service:8083
-          predicates:
-            - Path=/api/orders/**
-
-
-        - id: payment-service
-          uri: http://payment-service:8084
-          predicates:
-            - Path=/api/payments/**
+  endpoint:
+    gateway:
+      enabled: true

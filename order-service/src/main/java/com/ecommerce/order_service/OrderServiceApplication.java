@@ -6,10 +6,18 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableFeignClients
+@EnableFeignClients(
+        basePackages =
+                "com.ecommerce.order_service.feign"
+)
 @EnableScheduling
 public class OrderServiceApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
+
+    public static void main(String[] args){
+
+        SpringApplication.run(
+                OrderServiceApplication.class,args);
+
     }
+
 }

@@ -15,12 +15,14 @@ import com.ecommerce.order_service.repository.ReservationStockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ecommerce.order_service.feign.UserClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.ecommerce.order_service.dto.UserResponseDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +33,31 @@ public class CommandeService {
     private final ReservationStockRepository reservationStockRepository;
     private final CatalogClient catalogClient;
     private final PaymentClient paymentClient;
+    private final UserClient userClient;
 
     @Transactional
     public CommandeDTO creerCommande(CreerCommandeRequest request) {
+        UserResponseDTO utilisateur;
+
+        try {
+
+            utilisateur =
+                    userClient.getUser(request.getUtilisateurId());
+
+        } catch (Exception e){
+
+            throw new RessourceNonTrouveeException(
+                    "Utilisateur introuvable : "
+                            + request.getUtilisateurId()
+            );
+        }
+
+        if(utilisateur == null){
+            throw new RessourceNonTrouveeException(
+                    "Utilisateur introuvable"
+            );
+        }
+
         Panier panier = panierRepository.findByUtilisateurId(request.getUtilisateurId())
                 .orElseThrow(() -> new RessourceNonTrouveeException("Aucun panier trouvé pour cet utilisateur"));
 
