@@ -1,6 +1,7 @@
 package user_service.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -127,9 +128,12 @@ public class JwtService {
     public boolean isRefreshTokenValid(String token) {
         try {
             Claims claims = extractAllClaims(token);
+
             boolean isRefreshType = "refresh".equals(claims.get("type", String.class));
             boolean notExpired = claims.getExpiration().after(new Date());
+
             return isRefreshType && notExpired;
+
         } catch (JwtException | IllegalArgumentException ex) {
             return false;
         }

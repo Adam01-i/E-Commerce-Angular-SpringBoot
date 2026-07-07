@@ -34,7 +34,6 @@ Conforme au cahier des charges du projet de Master.
 - Bean Validation
 - Maven
 - Docker
-- Swagger / OpenAPI
 - Lombok
 - ModelMapper
 
@@ -126,7 +125,6 @@ Aucun autre microservice n'accède directement à cette base. Une seule table es
 - [x] BCrypt (chiffrement des mots de passe)
 - [x] Gestion centralisée des exceptions (`GlobalExceptionHandler` + 5 exceptions métier)
 - [x] Verrouillage temporaire après échecs de connexion répétés
-- [x] Swagger / OpenAPI (schéma Bearer JWT inclus)
 - [x] Endpoints REST complets (`/api/auth/**`, `/api/users/**`)
 
 ### En cours
@@ -182,7 +180,6 @@ user-service/
 | PUT | /api/users/{id}/activate | ADMIN |
 | PUT | /api/users/{id}/deactivate | ADMIN |
 
-Documentation interactive : `http://localhost:8081/swagger-ui.html`
 
 ---
 
@@ -210,7 +207,388 @@ Le service démarre sur le port `8081`, la base PostgreSQL dédiée sur le port 
 - ✔ BCrypt
 - ✔ Bean Validation
 - ✔ Gestion centralisée des exceptions
-- ✔ Swagger / OpenAPI
+
+---
+
+---
+
+# Documentation détaillée des endpoints
+
+Le microservice expose deux grandes catégories d'API :
+
+- **API publiques** : accessibles sans authentification.
+- **API protégées** : accessibles uniquement avec un jeton JWT valide. Certaines sont réservées aux administrateurs.
+
+---
+
+## 1. Inscription d'un utilisateur
+
+### Endpoint
+
+```http
+POST /api/auth/register
+```
+
+### Accès
+
+Public
+
+### Description
+
+Permet à un visiteur de créer un nouveau compte utilisateur.
+
+Lors de l'inscription :
+
+- le mot de passe est chiffré avec BCrypt ;
+- le rôle par défaut est **UTILISATEUR** ;
+- le compte est activé ;
+- un Access Token et un Refresh Token sont immédiatement générés.
+
+### Corps de la requête
+
+```json
+{
+    "nom": "Seck",
+    "prenom": "Adama",
+    "email": "adama@gmail.com",
+    "password": "Passer123",
+    "telephone": "771234567",
+    "adresse": "Dakar",
+    "avatarUrl": ""
+}
+```
+
+### Réponse
+
+```
+201 Created
+```
+
+Retourne :
+
+- Access Token
+- Refresh Token
+- Type du token
+- Durée d'expiration
+- Informations de l'utilisateur
+
+---
+
+## 2. Authentification (Connexion)
+
+### Endpoint
+
+```http
+POST /api/auth/login
+```
+
+### Accès
+
+Public
+
+### Description
+
+Authentifie un utilisateur à partir de son adresse e-mail et de son mot de passe.
+
+Après authentification :
+
+- vérification du mot de passe avec BCrypt ;
+- génération d'un nouvel Access Token ;
+- génération d'un Refresh Token.
+
+### Corps de la requête
+
+```json
+{
+    "email": "adama@gmail.com",
+    "password": "Passer123"
+}
+```
+
+### Réponse
+
+```
+200 OK
+```
+
+---
+
+## 3. Rafraîchissement du JWT
+
+### Endpoint
+
+```http
+POST /api/auth/refresh-token
+```
+
+### Accès
+
+Public
+
+### Description
+
+Permet d'obtenir un nouveau Access Token sans demander une nouvelle authentification.
+
+Le Refresh Token doit être valide et non expiré.
+
+### Corps de la requête
+
+```json
+{
+    "refreshToken": "..."
+}
+```
+
+### Réponse
+
+```
+200 OK
+```
+
+Retourne un nouvel Access Token.
+
+---
+
+## 4. Consultation de son profil
+
+### Endpoint
+
+```http
+GET /api/users/me
+```
+
+### Accès
+
+Utilisateur authentifié
+
+### Description
+
+Retourne les informations du compte associé au JWT fourni dans l'en-tête Authorization.
+
+### Header
+
+```text
+Authorization: Bearer <access_token>
+```
+
+### Réponse
+
+```
+200 OK
+```
+
+---
+
+## 5. Modification de son profil
+
+### Endpoint
+
+```http
+PUT /api/users/me
+```
+
+### Accès
+
+Utilisateur authentifié
+
+### Description
+
+Permet de modifier les informations personnelles :
+
+- nom
+- prénom
+- téléphone
+- adresse
+- avatar
+
+Le rôle et l'adresse e-mail ne peuvent pas être modifiés via cette route.
+
+### Réponse
+
+```
+200 OK
+```
+
+---
+
+## 6. Changement du mot de passe
+
+### Endpoint
+
+```http
+PUT /api/users/me/password
+```
+
+### Accès
+
+Utilisateur authentifié
+
+### Description
+
+Permet de modifier son mot de passe.
+
+L'ancien mot de passe doit obligatoirement être fourni.
+
+Le nouveau mot de passe est automatiquement chiffré avant d'être enregistré.
+
+### Réponse
+
+```
+200 OK
+```
+
+---
+
+## 7. Liste de tous les utilisateurs
+
+### Endpoint
+
+```http
+GET /api/users
+```
+
+### Accès
+
+Administrateur uniquement
+
+### Description
+
+Retourne la liste complète des utilisateurs enregistrés.
+
+### Réponse
+
+```
+200 OK
+```
+
+---
+
+## 8. Consultation d'un utilisateur
+
+### Endpoint
+
+```http
+GET /api/users/{id}
+```
+
+### Accès
+
+Administrateur uniquement
+
+### Description
+
+Retourne les informations d'un utilisateur à partir de son identifiant.
+
+### Réponse
+
+```
+200 OK
+```
+
+ou
+
+```
+404 Not Found
+```
+
+---
+
+## 9. Activation d'un compte
+
+### Endpoint
+
+```http
+PUT /api/users/{id}/activate
+```
+
+### Accès
+
+Administrateur uniquement
+
+### Description
+
+Active un compte utilisateur.
+
+L'utilisateur pourra alors accéder à l'application.
+
+### Réponse
+
+```
+200 OK
+```
+
+---
+
+## 10. Désactivation d'un compte
+
+### Endpoint
+
+```http
+PUT /api/users/{id}/deactivate
+```
+
+### Accès
+
+Administrateur uniquement
+
+### Description
+
+Désactive un compte utilisateur.
+
+L'utilisateur ne pourra plus se connecter.
+
+### Réponse
+
+```
+200 OK
+```
+
+---
+
+# Sécurité de l'API
+
+L'ensemble des endpoints protégés utilisent **JWT (JSON Web Token)**.
+
+Le client doit transmettre le jeton d'accès dans chaque requête :
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Les routes sont protégées selon les règles suivantes :
+
+| Endpoint | Authentification | Rôle requis |
+|-----------|-----------------|-------------|
+| /api/auth/** | Non | Aucun |
+| /api/users/me | Oui | UTILISATEUR ou ADMIN |
+| /api/users/me/password | Oui | UTILISATEUR ou ADMIN |
+| /api/users | Oui | ADMIN |
+| /api/users/{id} | Oui | ADMIN |
+| /api/users/{id}/activate | Oui | ADMIN |
+| /api/users/{id}/deactivate | Oui | ADMIN |
+
+---
+
+# Tests fonctionnels réalisés
+
+Les fonctionnalités suivantes ont été entièrement testées avec Postman :
+
+- ✅ Inscription d'un utilisateur
+- ✅ Authentification (connexion)
+- ✅ Génération de l'Access Token
+- ✅ Génération du Refresh Token
+- ✅ Rafraîchissement du JWT
+- ✅ Consultation du profil utilisateur
+- ✅ Modification du profil
+- ✅ Changement du mot de passe
+- ✅ Authentification JWT
+- ✅ Contrôle des rôles (UTILISATEUR / ADMIN)
+- ✅ Protection des endpoints
+- ✅ Activation d'un compte utilisateur
+- ✅ Désactivation d'un compte utilisateur
+- ✅ Gestion des erreurs HTTP (401, 403 et 404)
+
+L'ensemble de ces tests a été validé avec succès à l'aide de Postman.
 
 ---
 
