@@ -1,14 +1,20 @@
-# Image officielle Java 21
-FROM eclipse-temurin:21-jdk
+# Étape 1 : Build Maven
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
-# Dossier de travail
 WORKDIR /app
 
-# Le JAR sera copié ici lors du build
-COPY target/*.jar app.jar
+COPY pom.xml .
+COPY src ./src
 
-# Exposition du port (à adapter selon le service)
+RUN mvn clean package -DskipTests
+
+# Étape 2 : Image d'exécution
+FROM eclipse-temurin:21-jdk
+
+WORKDIR /app
+
+COPY --from=build /app/target/payment-service-0.0.1-SNAPSHOT.jar app.jar
+
 EXPOSE 8084
 
-# Démarrage de l'application
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
