@@ -1,0 +1,170 @@
+<app-admin-nav></app-admin-nav>
+
+<h1 class="h4 mb-4">Gestion des produits</h1>
+
+<div class="row">
+  <div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6">{{ editingId ? 'Modifier le produit' : 'Nouveau produit' }}</h2>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger py-2">{{ errorMessage }}</div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="mb-2">
+            <label class="form-label">Nom</label>
+            <input class="form-control" formControlName="nom" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" formControlName="description" rows="2"></textarea>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-2">
+              <label class="form-label">Prix</label>
+              <input type="number" class="form-control" formControlName="prix" />
+            </div>
+            <div class="col-6 mb-2">
+              <label class="form-label">Stock</label>
+              <input type="number" class="form-control" formControlName="stock" />
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Catégorie</label>
+            <select class="form-select" formControlName="categoryId">
+              <option [ngValue]="null" disabled>Choisir...</option>
+              @for (category of categories; track category.id) {
+                <option [ngValue]="category.id">{{ category.nom }}</option>
+              }
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">URL image</label>
+            <input class="form-control" formControlName="imagePrincipale" />
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">
+              {{ editingId ? 'Enregistrer' : 'Créer' }}
+            </button>
+            @if (editingId) {
+              <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">
+                Annuler
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border"></div>
+      </div>
+    } @else {
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Catégorie</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th>Statut</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of products; track product.id) {
+            <tr>
+              <td>{{ product.nom }}</td>
+              <td>{{ product.category?.nom }}</td>
+              <td>{{ product.prix | number: '1.2-2' }} FCFA</td>
+              <td>{{ product.stock }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class.text-bg-success]="product.statut === 'ACTIF'"
+                  [class.text-bg-secondary]="product.statut === 'MASQUE'"
+                >
+                  {{ product.statut }}
+                </span>
+              </td>
+              <td class="text-end text-nowrap">
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="edit(product)">
+                  Modifier
+                </button>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="toggleStatus(product)">
+                  {{ product.statut === 'ACTIF' ? 'Masquer' : 'Afficher' }}
+                </button>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="restock(product)">
+                  Stock +
+                </button>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="toggleBulkPricing(product)">
+                  Prix de gros
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="remove(product)">
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+            @if (expandedProductId === product.id) {
+              <tr>
+                <td colspan="6" class="bg-light">
+                  <h3 class="h6">Paliers de prix de gros — {{ product.nom }}</h3>
+
+                  @if (bulkPricings.length > 0) {
+                    <table class="table table-sm">
+                      <thead>
+                        <tr><th>Qté min.</th><th>Prix</th><th>Statut</th><th></th></tr>
+                      </thead>
+                      <tbody>
+                        @for (pricing of bulkPricings; track pricing.id) {
+                          <tr>
+                            <td>{{ pricing.quantiteMinimale }}</td>
+                            <td>{{ pricing.prix | number: '1.2-2' }} FCFA</td>
+                            <td>{{ pricing.statut }}</td>
+                            <td>
+                              <button
+                                class="btn btn-sm btn-outline-secondary me-1"
+                                (click)="toggleBulkPricingStatus(pricing, product)"
+                              >
+                                {{ pricing.statut === 'ACTIF' ? 'Désactiver' : 'Activer' }}
+                              </button>
+                              <button
+                                class="btn btn-sm btn-outline-danger"
+                                (click)="removeBulkPricing(pricing, product)"
+                              >
+                                Supprimer
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  } @else {
+                    <p class="text-muted small">Aucun palier défini.</p>
+                  }
+
+                  <form [formGroup]="bulkForm" class="d-flex gap-2 align-items-end" (ngSubmit)="addBulkPricing(product)">
+                    <div>
+                      <label class="form-label small mb-0">Qté minimale</label>
+                      <input type="number" class="form-control form-control-sm" formControlName="quantiteMinimale" />
+                    </div>
+                    <div>
+                      <label class="form-label small mb-0">Prix</label>
+                      <input type="number" class="form-control form-control-sm" formControlName="prix" />
+                    </div>
+                    <button class="btn btn-sm btn-primary" type="submit">Ajouter un palier</button>
+                  </form>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

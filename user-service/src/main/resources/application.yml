@@ -1,0 +1,50 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:postgresql://postgres-user:5432/userdb
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+application:
+  security:
+    jwt:
+      secret-key: "${JWT_SECRET:N2Q5YzNmMGY4YjJhNGQ2ZTliMWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM=}"
+      access-token-expiration: 900000       # 15 minutes en millisecondes
+      refresh-token-expiration: 604800000   # 7 jours en millisecondes
+      issuer: user-service
+
+  security-policy:
+    max-failed-attempts: 5
+    lock-duration-minutes: 15
+
+  admin-seed:
+    email: "${ADMIN_EMAIL:admin@ecommerce.local}"
+    password: "${ADMIN_PASSWORD:Admin1234!}"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+logging:
+  level:
+    user_service: INFO
+    org.springframework.security: INFO

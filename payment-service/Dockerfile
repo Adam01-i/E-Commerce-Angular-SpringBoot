@@ -1,9 +1,27 @@
-FROM eclipse-temurin:21-jdk
+# syntax=docker/dockerfile:1.7
+
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
-COPY target/payment-service-0.0.1-SNAPSHOT.jar app.jar
+COPY pom.xml .
+
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn dependency:go-offline -B
+
+COPY src ./src
+
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY --from=build /app/target/payment-service-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8084
 
-ENTRYPOINT ["java","-jar","app.jar"]
+ENV JAVA_OPTS="-Xms256m -Xmx512m"
+
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]

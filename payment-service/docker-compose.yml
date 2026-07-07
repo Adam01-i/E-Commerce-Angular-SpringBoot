@@ -1,0 +1,31 @@
+services:
+
+  postgres-payment:
+    image: postgres:16
+    container_name: postgres-payment
+    restart: always
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_payment_data:/var/lib/postgresql/data
+
+
+  payment-service:
+    build: .
+    container_name: payment-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres-payment
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-payment:5432/paymentdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+
+volumes:
+  postgres_payment_data:

@@ -1,0 +1,54 @@
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h1 class="h4 mb-4">Paiement</h1>
+
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border"></div>
+      </div>
+    } @else if (!payment || !commande) {
+      <p class="text-muted">Aucun paiement trouvé pour cette commande.</p>
+    } @else {
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="mb-1">Commande : <strong>{{ commande.numeroCommande }}</strong></p>
+          <p class="mb-1">Montant à payer : <strong>{{ payment.montant | number: '1.2-2' }} FCFA</strong></p>
+          <p class="mb-0">Mode de paiement : {{ payment.modePaiement }}</p>
+        </div>
+      </div>
+
+      @if (payment.statut === 'EN_ATTENTE') {
+        <div class="alert alert-info">
+          Aucun prestataire de paiement réel n'étant intégré dans ce projet académique, utilisez les
+          boutons ci-dessous pour simuler la réponse de la passerelle de paiement.
+        </div>
+        <div class="d-flex gap-2">
+          <button
+            class="btn btn-success flex-fill"
+            [disabled]="processing"
+            (click)="simulate('validate')"
+          >
+            Simuler un paiement réussi
+          </button>
+          <button
+            class="btn btn-outline-danger flex-fill"
+            [disabled]="processing"
+            (click)="simulate('reject')"
+          >
+            Simuler un échec
+          </button>
+        </div>
+      } @else if (payment.statut === 'VALIDE') {
+        <div class="alert alert-success">
+          Paiement validé avec succès.
+          <a [routerLink]="['/mes-commandes', commande.id]">Voir ma commande et ma facture</a>.
+        </div>
+      } @else {
+        <div class="alert alert-danger">
+          Le paiement a échoué, la commande a été annulée.
+          <a [routerLink]="['/mes-commandes', commande.id]">Voir ma commande</a>.
+        </div>
+      }
+    }
+  </div>
+</div>

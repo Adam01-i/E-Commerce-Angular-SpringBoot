@@ -1,0 +1,34 @@
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-4 text-center">Connexion</h1>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger">{{ errorMessage }}</div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" formControlName="email" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" class="form-control" formControlName="password" />
+          </div>
+          <button class="btn btn-primary w-100" type="submit" [disabled]="loading">
+            @if (loading) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            Se connecter
+          </button>
+        </form>
+
+        <p class="text-center mt-3 mb-0">
+          Pas encore de compte ? <a routerLink="/register">Créer un compte</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

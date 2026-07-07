@@ -6,6 +6,7 @@ import com.ecommerce.payment.entity.Payment;
 import com.ecommerce.payment.entity.PaymentStatus;
 import com.ecommerce.payment.exception.PaymentAlreadyValidatedException;
 import com.ecommerce.payment.exception.PaymentNotFoundException;
+import com.ecommerce.payment.feign.OrderClient;
 import com.ecommerce.payment.repository.PaymentRepository;
 import com.ecommerce.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class PaymentServiceImpl implements PaymentService {
             LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final PaymentRepository paymentRepository;
+    private final OrderClient orderClient;
 
     @Override
     public PaymentResponse createPayment(PaymentRequest request) {
@@ -51,6 +54,17 @@ public class PaymentServiceImpl implements PaymentService {
         logger.info("Paiement créé avec succès. ID = {}", saved.getId());
 
         return mapToResponse(saved);
+    }
+
+    @Override
+    public List<PaymentResponse> getAllPayments() {
+
+        logger.info("Récupération de l'ensemble des paiements");
+
+        return paymentRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Override
@@ -91,6 +105,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         logger.info("Paiement {} validé", id);
 
+        notifierOrderService(saved.getCommandeId(), "PAYEE");
+
         return mapToResponse(saved);
     }
 
@@ -109,7 +125,24 @@ public class PaymentServiceImpl implements PaymentService {
 
         logger.warn("Paiement {} rejeté", id);
 
+        notifierOrderService(saved.getCommandeId(), "ANNULEE");
+
         return mapToResponse(saved);
+    }
+
+    /**
+     * Notifie l'Order Service du nouveau statut de la commande suite à la validation/rejet
+     * du paiement. Ne doit jamais faire échouer l'opération de paiement elle-même : une
+     * indisponibilité de l'Order Service est journalisée mais n'est pas propagée à l'appelant
+     * (cf. exigence de disponibilité/isolation des pannes du cahier des charges).
+     */
+    private void notifierOrderService(Long commandeId, String etat) {
+        try {
+            orderClient.modifierStatutCommande(commandeId, Map.of("etat", etat));
+        } catch (Exception ex) {
+            logger.warn("Échec de la notification de l'Order Service pour la commande {} (etat={}) : {}",
+                    commandeId, etat, ex.getMessage());
+        }
     }
 
     private PaymentResponse mapToResponse(Payment payment) {
