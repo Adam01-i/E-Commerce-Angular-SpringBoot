@@ -1,14 +1,23 @@
-# Image officielle Java 21
-FROM eclipse-temurin:21-jdk
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
-# Dossier de travail
 WORKDIR /app
 
-# Le JAR sera copié ici lors du build
-COPY target/*.jar app.jar
+COPY pom.xml .
 
-# Exposition du port (à adapter selon le service)
+RUN mvn dependency:go-offline -B
+
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+
+FROM eclipse-temurin:21-jre-jammy
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+
 EXPOSE 8080
 
-# Démarrage de l'application
 ENTRYPOINT ["java","-jar","app.jar"]
