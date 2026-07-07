@@ -453,11 +453,175 @@ Cette approche garantit :
 - Une configuration centralisée grâce à Docker Compose.
 - Un déploiement rapide de toute l'application avec une seule commande :
 
+---
+
+## 1. Activer BuildKit
+
+Une seule fois dans ton terminal :
+
+```bash
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+```
+
+Pour que ce soit permanent :
+
+```bash
+echo 'export DOCKER_BUILDKIT=1' >> ~/.bashrc
+echo 'export COMPOSE_DOCKER_CLI_BUILD=1' >> ~/.bashrc
+source ~/.bashrc
+```
+
+---
+
+# 2. Lancer tout le projet
+
+```bash
+docker compose build
+```
+
+Ensuite :
+
 ```bash
 docker compose up -d
 ```
 
-L'ensemble du projet sera donc développé, testé et intégré directement dans son environnement Docker afin d'éviter les problèmes de configuration lors de la phase finale d'intégration.
+Le `-d` lance les conteneurs en arrière-plan.
+
+Tu peux vérifier :
+
+```bash
+docker ps
+```
+
+Tu devrais voir :
+
+```
+postgres-user
+postgres-catalog
+postgres-order
+postgres-payment
+user-service
+catalog-service
+order-service
+payment-service
+api-gateway
+frontend-angular
+```
+
+À partir de là, tu ne reconstruis plus.
+
+---
+
+# 3. Modifier seulement le frontend
+
+Si tu modifies Angular, inutile de refaire un build.
+
+Tu peux simplement faire
+
+```bash
+docker compose up frontend-angular
+```
+
+Angular recharge automatiquement les fichiers.
+
+---
+
+# 4. Modifier un seul microservice Java
+
+Supposons que tu modifies uniquement `order-service`.
+
+Tu fais uniquement :
+
+```bash
+docker compose build order-service
+```
+
+puis
+
+```bash
+docker compose up -d order-service
+```
+
+Les autres services ne sont pas reconstruits.
+
+---
+
+# 5. Utiliser `--no-deps`
+
+Si tu veux reconstruire seulement un service sans reconstruire ses dépendances :
+
+```bash
+docker compose up --build --no-deps order-service
+```
+
+ou
+
+```bash
+docker compose up --build --no-deps frontend-angular
+```
+
+C'est beaucoup plus rapide.
+
+---
+
+# 6. Le workflow que je te recommande
+
+Une seule fois au début :
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+Pendant le développement :
+
+* Si tu modifies le frontend :
+
+```bash
+docker compose up frontend-angular
+```
+
+ou
+
+```bash
+docker compose up --no-deps frontend-angular
+```
+
+* Si tu modifies `user-service` :
+
+```bash
+docker compose build user-service
+docker compose up -d user-service
+```
+
+* Si tu modifies `catalog-service` :
+
+```bash
+docker compose build catalog-service
+docker compose up -d catalog-service
+```
+
+* Si tu modifies `order-service` :
+
+```bash
+docker compose build order-service
+docker compose up -d order-service
+```
+
+* Si tu modifies `payment-service` :
+
+```bash
+docker compose build payment-service
+docker compose up -d payment-service
+```
+
+* Si tu modifies `api-gateway` :
+
+```bash
+docker compose build api-gateway
+docker compose up -d api-gateway
+```
 
 ---
 

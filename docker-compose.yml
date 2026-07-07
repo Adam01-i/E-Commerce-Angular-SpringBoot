@@ -187,6 +187,9 @@ services:
       - api-gateway
     ports:
       - "4200:4200"
+    volumes:
+      - ./frontend-angular:/app
+      - /app/node_modules
 
 
 
