@@ -9,6 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import jakarta.validation.constraints.DecimalMin;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "produits")
@@ -30,9 +35,10 @@ public class Product {
     private String description;
 
     @NotNull(message = "Le prix est obligatoire")
-    @Min(value = 0, message = "Le prix ne peut pas être négatif")
-    @Column(name = "prix", nullable = false, precision = 12, scale = 2) // Correspond à NUMERIC(12,2)
-    private Double prix;
+    @DecimalMin(value = "0.0", inclusive = true,
+            message = "Le prix ne peut pas être négatif")
+    @Column(name = "prix", nullable = false, precision = 12, scale = 2)
+    private BigDecimal prix;
 
     @NotNull(message = "La quantité en stock est obligatoire")
     @Min(value = 0, message = "Le stock ne peut pas être négatif")
@@ -52,8 +58,16 @@ public class Product {
     private String imagesSecondaires; // Liste d'URLs stockées sous forme de texte (séparées par des virgules par exemple)
 
     @ManyToOne
-    @JoinColumn(name = "categorie_id", nullable = false) // Correspond à la clé étrangère BIGINT / FK
+    @JoinColumn(name = "categorie_id", nullable = false)
     private Category category;
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonManagedReference
+    private List<BulkPricing> prixGros = new ArrayList<>();
 
     @Column(name = "date_creation", updatable = false)
     private LocalDateTime dateCreation;

@@ -27,7 +27,7 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Copie du JAR généré à l'étape précédente depuis l'image de build
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/catalog-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Déclaration du port d'écoute officiel du Catalog Service (8082)
 EXPOSE 8082

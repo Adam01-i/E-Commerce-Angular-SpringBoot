@@ -9,6 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.math.BigDecimal;
+import jakarta.validation.constraints.DecimalMin;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "prix_gros")
@@ -22,8 +25,8 @@ public class BulkPricing {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "produit_id", nullable = false) // Correspond à la clé étrangère BIGINT / FK toward PRODUITS.id
-    @JsonIgnore // Évite les boucles infinies lors de la conversion en JSON (Product -> BulkPricing -> Product)
+    @JoinColumn(name = "produit_id", nullable = false)
+    @JsonBackReference
     private Product product;
 
     @NotNull(message = "La quantité minimale est obligatoire")
@@ -32,9 +35,9 @@ public class BulkPricing {
     private Integer quantiteMinimale;
 
     @NotNull(message = "Le prix de gros est obligatoire")
-    @Min(value = 0, message = "Le prix de gros ne peut pas être négatif")
+    @DecimalMin(value = "0.0", inclusive = true, message = "Le prix de gros ne peut pas être négatif")
     @Column(name = "prix", nullable = false, precision = 12, scale = 2) // Correspond à NUMERIC(12,2)
-    private Double prix;
+    private BigDecimal prix;
 
     @NotBlank(message = "Le statut est obligatoire")
     @Size(max = 20)
