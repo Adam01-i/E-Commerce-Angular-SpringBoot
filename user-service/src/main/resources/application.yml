@@ -23,7 +23,7 @@ spring:
 application:
   security:
     jwt:
-      secret-key: "N2Q5YzNmMGY4YjJhNGQ2ZTliMWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM="
+      secret-key: "${JWT_SECRET:N2Q5YzNmMGY4YjJhNGQ2ZTliMWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM=}"
       access-token-expiration: 900000       # 15 minutes en millisecondes
       refresh-token-expiration: 604800000   # 7 jours en millisecondes
       issuer: user-service
@@ -31,6 +31,10 @@ application:
   security-policy:
     max-failed-attempts: 5
     lock-duration-minutes: 15
+
+  admin-seed:
+    email: "${ADMIN_EMAIL:admin@ecommerce.local}"
+    password: "${ADMIN_PASSWORD:Admin1234!}"
 
 springdoc:
   api-docs:

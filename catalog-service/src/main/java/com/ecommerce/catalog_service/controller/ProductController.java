@@ -28,11 +28,13 @@ public class ProductController {
     // ==========================================
 
     @GetMapping("/produits")
-    @Operation(summary = "Lister les produits (public, paginé)")
+    @Operation(summary = "Lister les produits (public : uniquement ACTIF ; admin : statut=ALL pour tout voir, paginé)")
     public ResponseEntity<Page<Product>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(catalogService.getAllProducts(PageRequest.of(page, size)));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String statut) {
+        boolean includeHidden = "ALL".equalsIgnoreCase(statut);
+        return ResponseEntity.ok(catalogService.getAllProducts(PageRequest.of(page, size), includeHidden));
     }
 
     @GetMapping("/produits/{id}")
@@ -47,8 +49,10 @@ public class ProductController {
 
     @GetMapping("/produits/recherche")
     @Operation(summary = "Rechercher un produit (public)")
-    public ResponseEntity<List<Product>> searchProducts(@RequestParam("q") String query) {
-        return ResponseEntity.ok(catalogService.searchProducts(query));
+    public ResponseEntity<List<Product>> searchProducts(
+            @RequestParam("q") String query,
+            @RequestParam(required = false) String statut) {
+        return ResponseEntity.ok(catalogService.searchProducts(query, "ALL".equalsIgnoreCase(statut)));
     }
 
     @GetMapping("/produits/filtrer")
@@ -56,8 +60,9 @@ public class ProductController {
     public ResponseEntity<List<Product>> filterProducts(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Double maxPrix,
-            @RequestParam(required = false) Integer minStock) {
-        return ResponseEntity.ok(catalogService.filterProducts(categoryId, maxPrix, minStock));
+            @RequestParam(required = false) Integer minStock,
+            @RequestParam(required = false) String statut) {
+        return ResponseEntity.ok(catalogService.filterProducts(categoryId, maxPrix, minStock, "ALL".equalsIgnoreCase(statut)));
     }
 
     @PostMapping("/produits")

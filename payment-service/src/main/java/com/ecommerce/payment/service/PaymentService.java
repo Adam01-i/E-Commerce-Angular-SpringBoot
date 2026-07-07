@@ -9,6 +9,8 @@ public interface PaymentService {
 
     PaymentResponse createPayment(PaymentRequest request);
 
+    List<PaymentResponse> getAllPayments();
+
     PaymentResponse getPaymentById(Long id);
 
     List<PaymentResponse> getPaymentsByCommande(Long commandeId);

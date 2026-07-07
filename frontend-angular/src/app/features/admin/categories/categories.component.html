@@ -1,0 +1,79 @@
+<app-admin-nav></app-admin-nav>
+
+<h1 class="h4 mb-4">Gestion des catégories</h1>
+
+<div class="row">
+  <div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6">{{ editingId ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger py-2">{{ errorMessage }}</div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="mb-2">
+            <label class="form-label">Nom</label>
+            <input class="form-control" formControlName="nom" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" formControlName="description" rows="3"></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit">
+              {{ editingId ? 'Enregistrer' : 'Créer' }}
+            </button>
+            @if (editingId) {
+              <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">
+                Annuler
+              </button>
+            }
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border"></div>
+      </div>
+    } @else {
+      <table class="table align-middle">
+        <thead>
+          <tr><th>Nom</th><th>Statut</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (category of categories; track category.id) {
+            <tr>
+              <td>{{ category.nom }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [class.text-bg-success]="category.statut === 'ACTIF'"
+                  [class.text-bg-secondary]="category.statut === 'MASQUE'"
+                >
+                  {{ category.statut }}
+                </span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="edit(category)">
+                  Modifier
+                </button>
+                <button class="btn btn-sm btn-outline-secondary me-1" (click)="toggleStatus(category)">
+                  {{ category.statut === 'ACTIF' ? 'Masquer' : 'Afficher' }}
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="remove(category)">
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

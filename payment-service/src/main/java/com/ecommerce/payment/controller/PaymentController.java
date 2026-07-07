@@ -25,6 +25,12 @@ public class PaymentController {
         return paymentService.createPayment(request);
     }
 
+    @Operation(summary = "Lister tous les paiements (admin, tableau de bord)")
+    @GetMapping
+    public List<PaymentResponse> getAllPayments() {
+        return paymentService.getAllPayments();
+    }
+
     @Operation(summary = "Rechercher un paiement par son identifiant")
     @GetMapping("/{id}")
     public PaymentResponse getPaymentById(@PathVariable Long id) {

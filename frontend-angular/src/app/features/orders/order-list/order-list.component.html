@@ -1,0 +1,53 @@
+<h1 class="h4 mb-4">Mes commandes</h1>
+
+@if (loading) {
+  <div class="text-center py-5">
+    <div class="spinner-border"></div>
+  </div>
+} @else if (commandes.length === 0) {
+  <p class="text-muted">Vous n'avez pas encore passé de commande.</p>
+} @else {
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>N° commande</th>
+          <th>Date</th>
+          <th>Statut</th>
+          <th>Montant</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (commande of commandes; track commande.id) {
+          <tr>
+            <td>{{ commande.numeroCommande }}</td>
+            <td>{{ commande.dateCommande | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <span
+                class="badge"
+                [class.text-bg-warning]="commande.etat === 'EN_ATTENTE'"
+                [class.text-bg-success]="commande.etat === 'PAYEE' || commande.etat === 'LIVREE'"
+                [class.text-bg-info]="commande.etat === 'EXPEDIEE'"
+                [class.text-bg-danger]="commande.etat === 'ANNULEE'"
+              >
+                {{ commande.etat }}
+              </span>
+            </td>
+            <td>{{ commande.montantTotal | number: '1.2-2' }} FCFA</td>
+            <td>
+              <a [routerLink]="['/mes-commandes', commande.id]" class="btn btn-sm btn-outline-primary">
+                Détail
+              </a>
+              @if (commande.etat === 'EN_ATTENTE') {
+                <a [routerLink]="['/paiement', commande.id]" class="btn btn-sm btn-primary ms-1">
+                  Payer
+                </a>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

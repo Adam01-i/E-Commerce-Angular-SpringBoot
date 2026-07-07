@@ -1,0 +1,43 @@
+<app-admin-nav></app-admin-nav>
+
+<h1 class="h4 mb-4">Toutes les commandes</h1>
+
+@if (loading) {
+  <div class="text-center py-5">
+    <div class="spinner-border"></div>
+  </div>
+} @else {
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>N° commande</th>
+        <th>Utilisateur</th>
+        <th>Date</th>
+        <th>Statut</th>
+        <th>Montant</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (commande of commandes; track commande.id) {
+        <tr>
+          <td>{{ commande.numeroCommande }}</td>
+          <td>#{{ commande.utilisateurId }}</td>
+          <td>{{ commande.dateCommande | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td><span class="badge text-bg-light border">{{ commande.etat }}</span></td>
+          <td>{{ commande.montantTotal | number: '1.2-2' }} FCFA</td>
+          <td class="text-end">
+            @for (etat of availableTransitions(commande); track etat) {
+              <button
+                class="btn btn-sm btn-outline-secondary me-1"
+                (click)="changeStatus(commande, etat)"
+              >
+                &rarr; {{ etat }}
+              </button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

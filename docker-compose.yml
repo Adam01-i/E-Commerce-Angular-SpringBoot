@@ -34,6 +34,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user:5432/userdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: &jwt_secret "N2Q5YzNmMGY4YjJhNGQ2ZTliMWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM="
 
 
 
@@ -169,6 +170,8 @@ services:
       - payment-service
     ports:
       - "8080:8080"
+    environment:
+      JWT_SECRET: *jwt_secret
 
 
 
