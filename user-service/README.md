@@ -126,11 +126,11 @@ Aucun autre microservice n'accède directement à cette base. Une seule table es
 - [x] Gestion centralisée des exceptions (`GlobalExceptionHandler` + 5 exceptions métier)
 - [x] Verrouillage temporaire après échecs de connexion répétés
 - [x] Endpoints REST complets (`/api/auth/**`, `/api/users/**`)
-
+- [x] Tests unitaires (services, sécurité)
+- [x] Tests Postman (collection à exporter et versionner)
+- 
 ### En cours
 
-- [ ] Tests unitaires (services, sécurité)
-- [ ] Tests Postman (collection à exporter et versionner)
 - [ ] Intégration avec l'API Gateway
 
 ---
