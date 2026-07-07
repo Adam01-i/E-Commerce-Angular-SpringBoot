@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   postgres-order:
     image: postgres:16
