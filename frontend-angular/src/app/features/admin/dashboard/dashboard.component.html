@@ -1,0 +1,66 @@
+<app-admin-nav></app-admin-nav>
+
+<h1 class="h4 mb-4">Tableau de bord</h1>
+
+@if (loading) {
+  <div class="text-center py-5">
+    <div class="spinner-border"></div>
+  </div>
+} @else {
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card text-bg-light h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Produits</h2>
+          <p class="mb-0">Actifs : <strong>{{ produitsActifs }}</strong></p>
+          <p class="mb-0">Masqués : <strong>{{ produitsMasques }}</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-bg-light h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Utilisateurs</h2>
+          <p class="mb-0">Inscrits : <strong>{{ totalUtilisateurs }}</strong></p>
+          <p class="mb-0">Actifs : <strong>{{ utilisateursActifs }}</strong></p>
+          <p class="mb-0">Désactivés : <strong>{{ utilisateursDesactives }}</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-bg-light h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Paiements réussis</h2>
+          <p class="mb-0">Nombre : <strong>{{ paiementsReussis }}</strong></p>
+          <p class="mb-0">Montant : <strong>{{ montantPaiementsReussis | number: '1.2-2' }} FCFA</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-bg-light h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Chiffre d'affaires</h2>
+          <p class="mb-0">Total (hors annulées) : <strong>{{ chiffreAffairesTotal | number: '1.2-2' }} FCFA</strong></p>
+          <p class="mb-0">Commandes : <strong>{{ totalCommandes }}</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h2 class="h6">Commandes par statut</h2>
+      <div class="row text-center">
+        @for (etat of etats; track etat) {
+          <div class="col">
+            <div class="fs-4 fw-bold">{{ commandesParEtat[etat] ?? 0 }}</div>
+            <div class="text-muted small">{{ etat }}</div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

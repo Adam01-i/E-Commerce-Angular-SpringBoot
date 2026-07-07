@@ -1,0 +1,75 @@
+<h1 class="h4 mb-4">Mon profil</h1>
+
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6">Informations personnelles</h2>
+
+        @if (profileSaved) {
+          <div class="alert alert-success py-2">Profil mis à jour.</div>
+        }
+        @if (profileError) {
+          <div class="alert alert-danger py-2">{{ profileError }}</div>
+        }
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="mb-2">
+            <label class="form-label">Email</label>
+            <input class="form-control" [value]="authService.currentUser()?.email" disabled />
+          </div>
+          <div class="row">
+            <div class="col-6 mb-2">
+              <label class="form-label">Prénom</label>
+              <input class="form-control" formControlName="prenom" />
+            </div>
+            <div class="col-6 mb-2">
+              <label class="form-label">Nom</label>
+              <input class="form-control" formControlName="nom" />
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Téléphone</label>
+            <input class="form-control" formControlName="telephone" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Adresse</label>
+            <input class="form-control" formControlName="adresse" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">URL avatar</label>
+            <input class="form-control" formControlName="avatarUrl" />
+          </div>
+          <button class="btn btn-primary" type="submit">Enregistrer</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6">Changer mon mot de passe</h2>
+
+        @if (passwordSaved) {
+          <div class="alert alert-success py-2">Mot de passe modifié.</div>
+        }
+        @if (passwordError) {
+          <div class="alert alert-danger py-2">{{ passwordError }}</div>
+        }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="mb-2">
+            <label class="form-label">Mot de passe actuel</label>
+            <input type="password" class="form-control" formControlName="oldPassword" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nouveau mot de passe</label>
+            <input type="password" class="form-control" formControlName="newPassword" />
+          </div>
+          <button class="btn btn-outline-primary" type="submit">Modifier le mot de passe</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

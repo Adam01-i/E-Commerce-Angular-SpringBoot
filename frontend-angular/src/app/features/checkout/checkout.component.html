@@ -1,0 +1,32 @@
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h1 class="h4 mb-4">Valider ma commande</h1>
+
+    @if (errorMessage) {
+      <div class="alert alert-danger">{{ errorMessage }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <label class="form-label">Adresse de livraison</label>
+        <textarea class="form-control" formControlName="adresseLivraison" rows="3"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Mode de paiement</label>
+        <select class="form-select" formControlName="modePaiement">
+          <option value="CARTE">Carte bancaire</option>
+          <option value="MOBILE_MONEY">Mobile Money</option>
+          <option value="VIREMENT">Virement</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary w-100" type="submit" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        Confirmer la commande
+      </button>
+    </form>
+  </div>
+</div>

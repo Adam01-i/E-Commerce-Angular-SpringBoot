@@ -17,10 +17,10 @@ public interface CatalogService {
 
     // --- Produits ---
     Product saveProduct(Product product);
-    Page<Product> getAllProducts(Pageable pageable); // Paginé
+    Page<Product> getAllProducts(Pageable pageable, boolean includeHidden); // Paginé ; includeHidden réservé à l'admin (voit aussi les produits MASQUE)
     Product getProductById(Long id);
-    List<Product> searchProducts(String query);
-    List<Product> filterProducts(Long categoryId, Double maxPrix, Integer minStock);
+    List<Product> searchProducts(String query, boolean includeHidden);
+    List<Product> filterProducts(Long categoryId, Double maxPrix, Integer minStock, boolean includeHidden);
     Product updateProduct(Long id, Product productDetails);
     void deleteProduct(Long id);
     Product changeProductStatus(Long id, String status);

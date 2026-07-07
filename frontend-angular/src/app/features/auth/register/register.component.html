@@ -1,0 +1,53 @@
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-4 text-center">Créer un compte</h1>
+
+        @if (errorMessage) {
+          <div class="alert alert-danger">{{ errorMessage }}</div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Prénom</label>
+              <input class="form-control" formControlName="prenom" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Nom</label>
+              <input class="form-control" formControlName="nom" />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" formControlName="email" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" class="form-control" formControlName="password" />
+            <div class="form-text">8 caractères minimum.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Téléphone (optionnel)</label>
+            <input class="form-control" formControlName="telephone" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Adresse (optionnel)</label>
+            <input class="form-control" formControlName="adresse" />
+          </div>
+          <button class="btn btn-primary w-100" type="submit" [disabled]="loading">
+            @if (loading) {
+              <span class="spinner-border spinner-border-sm me-2"></span>
+            }
+            Créer mon compte
+          </button>
+        </form>
+
+        <p class="text-center mt-3 mb-0">
+          Déjà un compte ? <a routerLink="/login">Se connecter</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

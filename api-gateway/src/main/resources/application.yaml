@@ -12,26 +12,60 @@ spring:
         webmvc:
           routes:
 
-            - id: user-service
+            - id: user-service-auth
+              uri: http://user-service:8081
+              predicates:
+                - Path=/api/auth/**
+
+            - id: user-service-users
               uri: http://user-service:8081
               predicates:
                 - Path=/api/users/**
 
-            - id: catalog-service
+            - id: catalog-service-produits
               uri: http://catalog-service:8082
               predicates:
-                - Path=/api/catalog/**
+                - Path=/api/produits/**
 
-            - id: order-service
+            - id: catalog-service-prix-gros
+              uri: http://catalog-service:8082
+              predicates:
+                - Path=/api/prix-gros/**
+
+            - id: catalog-service-categories
+              uri: http://catalog-service:8082
+              predicates:
+                - Path=/api/categories/**
+
+            - id: order-service-panier
               uri: http://order-service:8083
               predicates:
-                - Path=/api/orders/**
+                - Path=/api/panier/**
+
+            - id: order-service-commandes
+              uri: http://order-service:8083
+              predicates:
+                - Path=/api/commandes/**
+
+            - id: order-service-factures
+              uri: http://order-service:8083
+              predicates:
+                - Path=/api/factures/**
+
+            - id: order-service-historique
+              uri: http://order-service:8083
+              predicates:
+                - Path=/api/historique/**
 
             - id: payment-service
               uri: http://payment-service:8084
               predicates:
                 - Path=/api/payments/**
 
+application:
+  security:
+    jwt:
+      secret-key: "${JWT_SECRET:N2Q5YzNmMGY4YjJhNGQ2ZTliMWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM3ZDhlNWEzZjJiOWM=}"
 
 management:
   endpoints:

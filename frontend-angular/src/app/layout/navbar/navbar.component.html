@@ -1,0 +1,81 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/">🛒 E-Commerce</a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/produits" routerLinkActive="active">Catalogue</a>
+        </li>
+        @if (authService.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin" routerLinkActive="active">Administration</a>
+          </li>
+        }
+      </ul>
+
+      <form class="d-flex me-3" (submit)="onSearch(); $event.preventDefault()">
+        <input
+          class="form-control form-control-sm"
+          type="search"
+          placeholder="Rechercher un produit..."
+          [(ngModel)]="searchQuery"
+          name="q"
+        />
+      </form>
+
+      <ul class="navbar-nav align-items-lg-center gap-2">
+        @if (authService.isAuthenticated()) {
+          <li class="nav-item">
+            <a class="nav-link position-relative" routerLink="/panier">
+              <i class="bi bi-cart3"></i> Panier
+              @if (cartService.itemCount() > 0) {
+                <span
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                >
+                  {{ cartService.itemCount() }}
+                </span>
+              }
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/mes-commandes" routerLinkActive="active">Mes commandes</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+            >
+              {{ authService.currentUser()?.prenom }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" routerLink="/profil">Mon profil</a></li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <button class="dropdown-item" type="button" (click)="logout()">Déconnexion</button>
+              </li>
+            </ul>
+          </li>
+        } @else {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login">Connexion</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-outline-light btn-sm" routerLink="/register">Créer un compte</a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -76,8 +76,11 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public Page<Product> getAllProducts(Pageable pageable) {
-        return productRepository.findAll(pageable);
+    public Page<Product> getAllProducts(Pageable pageable, boolean includeHidden) {
+        if (includeHidden) {
+            return productRepository.findAll(pageable);
+        }
+        return productRepository.findByStatut("ACTIF", pageable);
     }
 
     @Override
@@ -87,17 +90,23 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public List<Product> searchProducts(String query) {
-        return productRepository.findByNomContainingIgnoreCase(query);
+    public List<Product> searchProducts(String query, boolean includeHidden) {
+        List<Product> results = productRepository.findByNomContainingIgnoreCase(query);
+        return includeHidden ? results : filterActifs(results);
     }
 
     @Override
-    public List<Product> filterProducts(Long categoryId, Double maxPrix, Integer minStock) {
+    public List<Product> filterProducts(Long categoryId, Double maxPrix, Integer minStock, boolean includeHidden) {
         // Idéalement à optimiser avec des Specifications JPA, mais voici une version simple
-        if (categoryId != null) {
-            return productRepository.findByCategoryId(categoryId);
-        }
-        return productRepository.findAll();
+        List<Product> results = categoryId != null
+                ? productRepository.findByCategoryId(categoryId)
+                : productRepository.findAll();
+        return includeHidden ? results : filterActifs(results);
+    }
+
+    // Le catalogue public (visiteur/utilisateur) ne doit jamais exposer un produit masqué par l'admin.
+    private List<Product> filterActifs(List<Product> products) {
+        return products.stream().filter(p -> "ACTIF".equals(p.getStatut())).toList();
     }
 
     @Override
