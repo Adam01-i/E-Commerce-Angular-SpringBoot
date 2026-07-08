@@ -1,36 +1,46 @@
 package com.ecommerce.catalog_service.service;
 
-import com.ecommerce.catalog_service.model.Category;
-import com.ecommerce.catalog_service.model.Product;
-import com.ecommerce.catalog_service.model.BulkPricing;
+import com.ecommerce.catalog_service.dto.request.BulkPricingRequestDTO;
+import com.ecommerce.catalog_service.dto.request.CreateCategoryRequestDTO;
+import com.ecommerce.catalog_service.dto.request.CreateProductRequestDTO;
+import com.ecommerce.catalog_service.dto.request.UpdateProductRequestDTO;
+import com.ecommerce.catalog_service.dto.response.BulkPricingDTO;
+import com.ecommerce.catalog_service.dto.response.CategoryResponseDTO;
+import com.ecommerce.catalog_service.dto.response.ProductResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
+/**
+ * Contrat du service catalogue. Toutes les méthodes retournent des DTO :
+ * plus aucune entité JPA ne traverse la frontière service -> controller.
+ */
 public interface CatalogService {
+
     // --- Catégories ---
-    Category saveCategory(Category category);
-    List<Category> getAllCategories();
-    Category updateCategory(Long id, Category categoryDetails);
+    CategoryResponseDTO saveCategory(CreateCategoryRequestDTO request);
+    List<CategoryResponseDTO> getAllCategories();
+    CategoryResponseDTO updateCategory(Long id, CreateCategoryRequestDTO request);
     void deleteCategory(Long id);
-    Category changeCategoryStatus(Long id, String status);
+    CategoryResponseDTO changeCategoryStatus(Long id, String status);
 
     // --- Produits ---
-    Product saveProduct(Product product);
-    Page<Product> getAllProducts(Pageable pageable, boolean includeHidden); // Paginé ; includeHidden réservé à l'admin (voit aussi les produits MASQUE)
-    Product getProductById(Long id);
-    List<Product> searchProducts(String query, boolean includeHidden);
-    List<Product> filterProducts(Long categoryId, Double maxPrix, Integer minStock, boolean includeHidden);
-    Product updateProduct(Long id, Product productDetails);
+    ProductResponseDTO saveProduct(CreateProductRequestDTO request);
+    Page<ProductResponseDTO> getAllProducts(Pageable pageable, boolean includeHidden);
+    ProductResponseDTO getProductById(Long id);
+    List<ProductResponseDTO> searchProducts(String query, boolean includeHidden);
+    List<ProductResponseDTO> filterProducts(Long categoryId, Double maxPrix, Integer minStock, boolean includeHidden);
+    ProductResponseDTO updateProduct(Long id, UpdateProductRequestDTO request);
     void deleteProduct(Long id);
-    Product changeProductStatus(Long id, String status);
-    Product restockProduct(Long id, Integer quantity);
+    ProductResponseDTO changeProductStatus(Long id, String status);
+    ProductResponseDTO restockProduct(Long id, Integer quantity);
     boolean checkAvailability(Long id, Integer quantity);
 
-    // --- Prix de Gros ---
-    List<BulkPricing> getBulkPricingsByProduct(Long productId);
-    BulkPricing addBulkPricing(Long productId, BulkPricing bulkPricing);
-    BulkPricing updateBulkPricing(Long id, BulkPricing bulkPricingDetails);
+    // --- Prix de gros ---
+    List<BulkPricingDTO> getBulkPricingsByProduct(Long productId);
+    BulkPricingDTO addBulkPricing(Long productId, BulkPricingRequestDTO request);
+    BulkPricingDTO updateBulkPricing(Long id, BulkPricingRequestDTO request);
     void deleteBulkPricing(Long id);
-    BulkPricing changeBulkPricingStatus(Long id, String status);
+    BulkPricingDTO changeBulkPricingStatus(Long id, String status);
 }

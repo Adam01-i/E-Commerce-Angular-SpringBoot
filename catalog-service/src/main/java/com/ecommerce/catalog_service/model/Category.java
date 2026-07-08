@@ -1,22 +1,35 @@
 package com.ecommerce.catalog_service.model;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Entité JPA représentant une catégorie de produits.
+ *
+ * IMPORTANT : cette classe ne porte plus aucune annotation Jackson
+ * (@JsonIgnore, @JsonManagedReference, @JsonBackReference). La sérialisation
+ * JSON n'est plus la responsabilité de l'entité : c'est le rôle des DTO
+ * (CategoryResponseDTO, CategorySimpleDTO) et du CategoryMapper. L'entité
+ * n'existe que pour la persistance et les relations JPA.
+ */
 @Entity
 @Table(name = "categories")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Correspond au BIGSERIAL (Auto-incrément PostgreSQL)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank(message = "Le nom de la catégorie est obligatoire")
@@ -30,9 +43,14 @@ public class Category {
     @NotBlank(message = "Le statut est obligatoire")
     @Size(max = 20)
     @Column(name = "statut", nullable = false, length = 20)
-    private String statut = "ACTIF"; // Valeur par défaut : ACTIF ou MASQUE
+    private String statut = "ACTIF";
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    @JsonIgnore // Évite les boucles infinies en JSON quand on liera avec les produits
-    private List<Product> produits;
+    /**
+     * Côté inverse de la relation, jamais sérialisé (pas de @JsonIgnore
+     * nécessaire ici puisque cette entité n'est plus jamais renvoyée
+     * directement par un contrôleur). mappedBy = "category" correspond au
+     * nom du champ dans Product.
+     */
+    @OneToMany(mappedBy = "category")
+    private List<Product> produits = new ArrayList<>();
 }
