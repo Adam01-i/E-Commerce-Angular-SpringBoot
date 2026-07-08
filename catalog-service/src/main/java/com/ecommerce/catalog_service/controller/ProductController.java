@@ -118,8 +118,7 @@ public class ProductController {
     @GetMapping("/produits/{id}/disponibilite")
     public ResponseEntity<ProduitDisponibiliteResponseDTO> verifierDisponibilite(
             @PathVariable Long id,
-            @RequestParam Integer quantite
-    ) {
+            @RequestParam Integer quantite) {
 
         ProductResponseDTO produit = catalogService.getProductById(id);
 
@@ -128,11 +127,13 @@ public class ProductController {
                         && "ACTIF".equals(produit.getStatut());
 
         return ResponseEntity.ok(
-                new ProduitDisponibiliteResponseDTO(
-                        produit.getId(),
-                        quantite,
-                        disponible
-                )
+                ProduitDisponibiliteResponseDTO.builder()
+                        .produitId(produit.getId())
+                        .quantiteDemandee(quantite)
+                        .disponible(disponible)
+                        .stock(produit.getStock())
+                        .prixApplicable(produit.getPrix())
+                        .build()
         );
     }
 

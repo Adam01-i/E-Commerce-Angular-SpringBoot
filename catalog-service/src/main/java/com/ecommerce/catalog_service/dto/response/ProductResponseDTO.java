@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ import java.util.List;
  * (pas de référence retour vers le produit), ce qui élimine tout risque de
  * cycle de sérialisation JSON.
  */
+
+@Data
 @Getter
 @Setter
 @NoArgsConstructor
