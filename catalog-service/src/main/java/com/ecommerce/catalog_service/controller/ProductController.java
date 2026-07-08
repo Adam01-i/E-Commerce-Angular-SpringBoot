@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.ecommerce.catalog_service.dto.response.ProduitDisponibiliteResponseDTO;
 import java.util.List;
 
 /**
@@ -114,13 +114,26 @@ public class ProductController {
         return ResponseEntity.ok(catalogService.restockProduct(id, quantite));
     }
 
+    @Operation(summary = "Vérifier la disponibilité du stock (interne)")
     @GetMapping("/produits/{id}/disponibilite")
-    @Operation(summary = "Vérifier la disponibilité du stock (interne, OpenFeign)")
-    public ResponseEntity<Boolean> checkAvailability(@PathVariable Long id, @RequestParam Integer quantite) {
-        if (quantite == null || quantite <= 0) {
-            throw new BusinessException("La quantité demandée doit être strictement positive");
-        }
-        return ResponseEntity.ok(catalogService.checkAvailability(id, quantite));
+    public ResponseEntity<ProduitDisponibiliteResponseDTO> verifierDisponibilite(
+            @PathVariable Long id,
+            @RequestParam Integer quantite
+    ) {
+
+        ProductResponseDTO produit = catalogService.getProductById(id);
+
+        boolean disponible =
+                produit.getStock() >= quantite
+                        && "ACTIF".equals(produit.getStatut());
+
+        return ResponseEntity.ok(
+                new ProduitDisponibiliteResponseDTO(
+                        produit.getId(),
+                        quantite,
+                        disponible
+                )
+        );
     }
 
     // ==========================================

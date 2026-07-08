@@ -94,7 +94,7 @@ public class CommandeService {
 
         // 2. Réserver le stock pour chaque ligne (appel Catalog + trace locale)
         for (LigneCommande ligne : lignes) {
-            catalogClient.verifierDisponibilite(ligne.getProduitId()); // vérif simple ici
+            catalogClient.verifierDisponibilite(ligne.getProduitId(), ligne.getQuantite()); // vérif simple ici
 
             ReservationStock reservation = new ReservationStock();
             reservation.setCommandeId(sauvegardee.getId());

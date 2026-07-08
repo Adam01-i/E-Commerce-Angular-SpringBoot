@@ -34,7 +34,11 @@ public class PanierService {
         Panier panier = getOuCreerPanier(utilisateurId);
 
         // Vérifie la disponibilité et récupère le prix via Catalog Service (OpenFeign)
-        ProduitDisponibiliteDTO disponibilite = catalogClient.verifierDisponibilite(request.getProduitId());
+        ProduitDisponibiliteDTO disponibilite =
+                catalogClient.verifierDisponibilite(
+                        request.getProduitId(),
+                        request.getQuantite()
+                );
 
         if (!disponibilite.isDisponible() || disponibilite.getStock() < request.getQuantite()) {
             throw new IllegalStateException("Stock insuffisant pour ce produit");
