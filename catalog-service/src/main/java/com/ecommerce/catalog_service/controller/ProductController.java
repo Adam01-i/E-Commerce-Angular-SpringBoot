@@ -1,5 +1,6 @@
 package com.ecommerce.catalog_service.controller;
 
+import com.ecommerce.catalog_service.dto.ProduitDisponibiliteDTO;
 import com.ecommerce.catalog_service.model.Product;
 import com.ecommerce.catalog_service.model.BulkPricing;
 import com.ecommerce.catalog_service.service.CatalogService;
@@ -123,22 +124,12 @@ public class ProductController {
     }
 
     @GetMapping("/produits/{id}/disponibilite")
-    @Operation(summary = "Vérifier stock (interne, OpenFeign)")
-    public ResponseEntity<Boolean> checkAvailability(@PathVariable Long id, @RequestParam Integer quantite) {
-        boolean available = catalogService.checkAvailability(id, quantite);
-        if (productRepositoryExists(id)) {
-            return ResponseEntity.ok(available);
-        } else {
-            return ResponseEntity.notFound().build(); // 404 si le produit n'existe pas du tout
-        }
-    }
-
-    private boolean productRepositoryExists(Long id) {
+    @Operation(summary = "Vérifier stock et prix courant (interne, OpenFeign)")
+    public ResponseEntity<ProduitDisponibiliteDTO> checkAvailability(@PathVariable Long id) {
         try {
-            catalogService.getProductById(id);
-            return true;
+            return ResponseEntity.ok(catalogService.checkAvailability(id));
         } catch (IllegalArgumentException e) {
-            return false;
+            return ResponseEntity.notFound().build(); // 404 si le produit n'existe pas du tout
         }
     }
 

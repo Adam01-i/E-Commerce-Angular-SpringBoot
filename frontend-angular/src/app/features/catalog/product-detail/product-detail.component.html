@@ -50,27 +50,29 @@
         </div>
       }
 
-      <div class="d-flex align-items-center gap-2">
-        <input
-          type="number"
-          class="form-control"
-          style="width: 100px;"
-          [(ngModel)]="quantite"
-          min="1"
-          [max]="product.stock"
-        />
-        <button
-          class="btn btn-primary"
-          [disabled]="product.stock === 0"
-          (click)="addToCart()"
-        >
-          @if (added) {
-            Ajouté au panier ✓
-          } @else {
-            Ajouter au panier
-          }
-        </button>
-      </div>
+      @if (!authService.isAdmin()) {
+        <div class="d-flex align-items-center gap-2">
+          <input
+            type="number"
+            class="form-control"
+            style="width: 100px;"
+            [(ngModel)]="quantite"
+            min="1"
+            [max]="product.stock"
+          />
+          <button
+            class="btn btn-primary"
+            [disabled]="product.stock === 0"
+            (click)="addToCart()"
+          >
+            @if (added) {
+              Ajouté au panier ✓
+            } @else {
+              Ajouter au panier
+            }
+          </button>
+        </div>
+      }
     </div>
   </div>
 } @else {

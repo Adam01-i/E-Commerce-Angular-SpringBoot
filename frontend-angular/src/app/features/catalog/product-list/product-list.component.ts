@@ -28,6 +28,7 @@ export class ProductListComponent implements OnInit {
   page = 0;
   pageSize = 12;
   totalPages = 0;
+  totalProducts = 0;
 
   addedProductId: number | null = null;
 
@@ -35,7 +36,7 @@ export class ProductListComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService,
-    private authService: AuthService,
+    public authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -66,6 +67,7 @@ export class ProductListComponent implements OnInit {
       this.productService.list(this.page, this.pageSize).subscribe((result: Page<Product>) => {
         this.products = result.content;
         this.totalPages = result.totalPages;
+        this.totalProducts = result.totalElements;
         this.loading = false;
       });
     }

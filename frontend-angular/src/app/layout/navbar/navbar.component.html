@@ -35,21 +35,23 @@
 
       <ul class="navbar-nav align-items-lg-center gap-2">
         @if (authService.isAuthenticated()) {
-          <li class="nav-item">
-            <a class="nav-link position-relative" routerLink="/panier">
-              <i class="bi bi-cart3"></i> Panier
-              @if (cartService.itemCount() > 0) {
-                <span
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                >
-                  {{ cartService.itemCount() }}
-                </span>
-              }
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/mes-commandes" routerLinkActive="active">Mes commandes</a>
-          </li>
+          @if (!authService.isAdmin()) {
+            <li class="nav-item">
+              <a class="nav-link position-relative" routerLink="/panier">
+                <i class="bi bi-cart3"></i> Panier
+                @if (cartService.itemCount() > 0) {
+                  <span
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  >
+                    {{ cartService.itemCount() }}
+                  </span>
+                }
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/mes-commandes" routerLinkActive="active">Mes commandes</a>
+            </li>
+          }
           <li class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"

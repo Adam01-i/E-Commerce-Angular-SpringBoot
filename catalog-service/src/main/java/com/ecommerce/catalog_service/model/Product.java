@@ -64,7 +64,8 @@ public class Product {
     @OneToMany(
             mappedBy = "product",
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
     )
     @JsonManagedReference
     private List<BulkPricing> prixGros = new ArrayList<>();

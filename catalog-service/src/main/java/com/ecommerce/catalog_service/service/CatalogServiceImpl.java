@@ -1,5 +1,6 @@
 package com.ecommerce.catalog_service.service;
 
+import com.ecommerce.catalog_service.dto.ProduitDisponibiliteDTO;
 import com.ecommerce.catalog_service.model.Category;
 import com.ecommerce.catalog_service.model.Product;
 import com.ecommerce.catalog_service.model.BulkPricing;
@@ -143,12 +144,10 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public boolean checkAvailability(Long id, Integer quantity) {
-        Product product = productRepository.findById(id).orElse(null);
-        if (product == null || "MASQUE".equals(product.getStatut())) {
-            return false;
-        }
-        return product.getStock() >= quantity;
+    public ProduitDisponibiliteDTO checkAvailability(Long id) {
+        Product product = getProductById(id);
+        boolean disponible = "ACTIF".equals(product.getStatut()) && product.getStock() > 0;
+        return new ProduitDisponibiliteDTO(product.getId(), disponible, product.getStock(), product.getPrix());
     }
 
     // ==========================================

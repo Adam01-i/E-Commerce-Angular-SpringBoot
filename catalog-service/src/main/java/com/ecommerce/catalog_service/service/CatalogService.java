@@ -1,5 +1,6 @@
 package com.ecommerce.catalog_service.service;
 
+import com.ecommerce.catalog_service.dto.ProduitDisponibiliteDTO;
 import com.ecommerce.catalog_service.model.Category;
 import com.ecommerce.catalog_service.model.Product;
 import com.ecommerce.catalog_service.model.BulkPricing;
@@ -25,7 +26,7 @@ public interface CatalogService {
     void deleteProduct(Long id);
     Product changeProductStatus(Long id, String status);
     Product restockProduct(Long id, Integer quantity);
-    boolean checkAvailability(Long id, Integer quantity);
+    ProduitDisponibiliteDTO checkAvailability(Long id);
 
     // --- Prix de Gros ---
     List<BulkPricing> getBulkPricingsByProduct(Long productId);

@@ -71,6 +71,13 @@ public class GatewaySecurityFilter extends OncePerRequestFilter {
             new AdminRule("GET", "/api/payments")
     );
 
+    // Réservées au rôle UTILISATEUR : un ADMIN gère la plateforme, il n'achète pas
+    // (le panier et la création de commande sont des actions acheteur, pas admin).
+    private static final List<AdminRule> BUYER_ONLY_RULES = List.of(
+            new AdminRule(null, "/api/panier/**"),
+            new AdminRule("POST", "/api/commandes")
+    );
+
     private final JwtValidator jwtValidator;
 
     public GatewaySecurityFilter(JwtValidator jwtValidator) {
@@ -123,6 +130,14 @@ public class GatewaySecurityFilter extends OncePerRequestFilter {
 
         if (requiresAdmin && !user.isAdmin()) {
             writeError(response, HttpServletResponse.SC_FORBIDDEN, "Accès réservé à l'administrateur");
+            return;
+        }
+
+        boolean forbiddenForAdmin = user.isAdmin()
+                && BUYER_ONLY_RULES.stream().anyMatch(rule -> rule.matches(method, path));
+
+        if (forbiddenForAdmin) {
+            writeError(response, HttpServletResponse.SC_FORBIDDEN, "Action réservée aux comptes utilisateur (achat)");
             return;
         }
 

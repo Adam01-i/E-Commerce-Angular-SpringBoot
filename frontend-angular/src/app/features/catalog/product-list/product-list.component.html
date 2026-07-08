@@ -1,3 +1,55 @@
+@if (!searchMode && page === 0) {
+  <div
+    class="rounded-4 p-4 p-md-5 mb-4 text-white"
+    style="background: linear-gradient(135deg, #212529 0%, #0d47a1 100%);"
+  >
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="badge bg-primary bg-opacity-75 mb-3">🛒 E-Commerce</span>
+        <h1 class="display-6 fw-bold mb-3">Tout ce qu'il vous faut, livré chez vous</h1>
+        <p class="lead text-white-50 mb-4">
+          Électronique, mode, maison, sport et plus encore : des milliers de références à
+          petit prix, avec paiement sécurisé et suivi de commande en temps réel.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a routerLink="/produits" class="btn btn-primary btn-lg">Découvrir le catalogue</a>
+          @if (!authService.isAuthenticated()) {
+            <a routerLink="/register" class="btn btn-outline-light btn-lg">Créer un compte</a>
+          }
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="row row-cols-2 g-3 text-center">
+          <div class="col">
+            <div class="bg-white bg-opacity-10 rounded-3 py-3">
+              <div class="fs-3 fw-bold">{{ totalProducts }}+</div>
+              <div class="small text-white-50">Produits</div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="bg-white bg-opacity-10 rounded-3 py-3">
+              <div class="fs-3 fw-bold">{{ categories.length }}</div>
+              <div class="small text-white-50">Catégories</div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="bg-white bg-opacity-10 rounded-3 py-3">
+              <div class="fs-3 fw-bold">24/7</div>
+              <div class="small text-white-50">Commande en ligne</div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="bg-white bg-opacity-10 rounded-3 py-3">
+              <div class="fs-3 fw-bold">🔒</div>
+              <div class="small text-white-50">Paiement sécurisé</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
 <div class="row">
   <aside class="col-md-3 mb-4">
     <div class="card">
@@ -69,19 +121,21 @@
                     <span class="text-danger">Rupture de stock</span>
                   }
                 </p>
-                <div class="mt-auto d-grid gap-2">
-                  <button
-                    class="btn btn-primary btn-sm"
-                    [disabled]="product.stock === 0"
-                    (click)="addToCart(product)"
-                  >
-                    @if (addedProductId === product.id) {
-                      Ajouté ✓
-                    } @else {
-                      Ajouter au panier
-                    }
-                  </button>
-                </div>
+                @if (!authService.isAdmin()) {
+                  <div class="mt-auto d-grid gap-2">
+                    <button
+                      class="btn btn-primary btn-sm"
+                      [disabled]="product.stock === 0"
+                      (click)="addToCart(product)"
+                    >
+                      @if (addedProductId === product.id) {
+                        Ajouté ✓
+                      } @else {
+                        Ajouter au panier
+                      }
+                    </button>
+                  </div>
+                }
               </div>
             </div>
           </div>

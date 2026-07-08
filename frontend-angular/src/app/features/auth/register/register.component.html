@@ -12,21 +12,51 @@
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label">Prénom</label>
-              <input class="form-control" formControlName="prenom" />
+              <input
+                class="form-control"
+                [class.is-invalid]="form.controls.prenom.invalid && form.controls.prenom.touched"
+                formControlName="prenom"
+              />
+              @if (form.controls.prenom.invalid && form.controls.prenom.touched) {
+                <div class="invalid-feedback">Le prénom est requis.</div>
+              }
             </div>
             <div class="col-md-6 mb-3">
               <label class="form-label">Nom</label>
-              <input class="form-control" formControlName="nom" />
+              <input
+                class="form-control"
+                [class.is-invalid]="form.controls.nom.invalid && form.controls.nom.touched"
+                formControlName="nom"
+              />
+              @if (form.controls.nom.invalid && form.controls.nom.touched) {
+                <div class="invalid-feedback">Le nom est requis.</div>
+              }
             </div>
           </div>
           <div class="mb-3">
             <label class="form-label">Email</label>
-            <input type="email" class="form-control" formControlName="email" />
+            <input
+              type="email"
+              class="form-control"
+              [class.is-invalid]="form.controls.email.invalid && form.controls.email.touched"
+              formControlName="email"
+            />
+            @if (form.controls.email.invalid && form.controls.email.touched) {
+              <div class="invalid-feedback">Merci de saisir un email valide.</div>
+            }
           </div>
           <div class="mb-3">
             <label class="form-label">Mot de passe</label>
-            <input type="password" class="form-control" formControlName="password" />
+            <input
+              type="password"
+              class="form-control"
+              [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+              formControlName="password"
+            />
             <div class="form-text">8 caractères minimum.</div>
+            @if (form.controls.password.invalid && form.controls.password.touched) {
+              <div class="invalid-feedback">Le mot de passe doit contenir au moins 8 caractères.</div>
+            }
           </div>
           <div class="mb-3">
             <label class="form-label">Téléphone (optionnel)</label>
