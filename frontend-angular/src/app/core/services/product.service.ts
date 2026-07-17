@@ -44,12 +44,24 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.baseUrl}/filtrer`, { params });
   }
 
-  create(product: ProductWriteRequest): Observable<Product> {
-    return this.http.post<Product>(this.baseUrl, product);
+  create(product: ProductWriteRequest, image?: File | null): Observable<Product> {
+    return this.http.post<Product>(this.baseUrl, this.buildFormData(product, image));
   }
 
-  update(id: number, product: ProductWriteRequest): Observable<Product> {
-    return this.http.put<Product>(`${this.baseUrl}/${id}`, product);
+  update(id: number, product: ProductWriteRequest, image?: File | null): Observable<Product> {
+    return this.http.put<Product>(`${this.baseUrl}/${id}`, this.buildFormData(product, image));
+  }
+
+  // Le champ image est désormais un fichier uploadé (et non plus une URL saisie) :
+  // on envoie donc le produit et le fichier en multipart/form-data. Ne pas fixer
+  // manuellement le header Content-Type : le navigateur doit générer le boundary.
+  private buildFormData(product: ProductWriteRequest, image?: File | null): FormData {
+    const formData = new FormData();
+    formData.append('product', new Blob([JSON.stringify(product)], { type: 'application/json' }));
+    if (image) {
+      formData.append('image', image);
+    }
+    return formData;
   }
 
   delete(id: number): Observable<void> {

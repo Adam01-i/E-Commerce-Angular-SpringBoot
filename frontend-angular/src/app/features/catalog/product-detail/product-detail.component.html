@@ -8,7 +8,7 @@
   <div class="row">
     <div class="col-md-5">
       <img
-        [src]="product.imagePrincipale || 'https://placehold.co/500x400?text=Produit'"
+        [src]="resolveImageUrl(product.imagePrincipale, 'https://placehold.co/500x400?text=Produit')"
         class="img-fluid rounded"
         [alt]="product.nom"
       />

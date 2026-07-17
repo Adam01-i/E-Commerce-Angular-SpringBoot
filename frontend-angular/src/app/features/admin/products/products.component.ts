@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BulkPricing, Category, Product } from '../../../core/models/models';
+import { resolveProductImageUrl } from '../../../core/utils/image-url';
 import { CategoryService } from '../../../core/services/category.service';
 import { ProductService } from '../../../core/services/product.service';
 import { AdminNavComponent } from '../admin-nav/admin-nav.component';
@@ -16,11 +17,17 @@ import { AdminNavComponent } from '../admin-nav/admin-nav.component';
 export class AdminProductsComponent implements OnInit {
   private fb = inject(FormBuilder);
 
+  @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+
   products: Product[] = [];
   categories: Category[] = [];
   loading = true;
   editingId: number | null = null;
   errorMessage: string | null = null;
+
+  selectedFile: File | null = null;
+  existingImageUrl: string | null = null;
+  resolveImageUrl = resolveProductImageUrl;
 
   expandedProductId: number | null = null;
   bulkPricings: BulkPricing[] = [];
@@ -35,8 +42,7 @@ export class AdminProductsComponent implements OnInit {
     description: [''],
     prix: [0, [Validators.required, Validators.min(0)]],
     stock: [0, [Validators.required, Validators.min(0)]],
-    categoryId: [null as number | null, Validators.required],
-    imagePrincipale: ['']
+    categoryId: [null as number | null, Validators.required]
   });
 
   constructor(
@@ -59,19 +65,35 @@ export class AdminProductsComponent implements OnInit {
 
   edit(product: Product): void {
     this.editingId = product.id;
+    this.existingImageUrl = product.imagePrincipale ?? null;
+    this.selectedFile = null;
+    this.resetFileInput();
     this.form.setValue({
       nom: product.nom,
       description: product.description ?? '',
       prix: product.prix,
       stock: product.stock,
-      categoryId: product.category?.id ?? null,
-      imagePrincipale: product.imagePrincipale ?? ''
+      categoryId: product.category?.id ?? null
     });
   }
 
   cancelEdit(): void {
     this.editingId = null;
+    this.existingImageUrl = null;
+    this.selectedFile = null;
+    this.resetFileInput();
     this.form.reset({ prix: 0, stock: 0, categoryId: null });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile = input.files?.[0] ?? null;
+  }
+
+  private resetFileInput(): void {
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
   submit(): void {
@@ -86,13 +108,12 @@ export class AdminProductsComponent implements OnInit {
       description: value.description ?? '',
       prix: value.prix!,
       stock: value.stock!,
-      imagePrincipale: value.imagePrincipale ?? '',
       category: { id: value.categoryId! }
     };
 
     const request$ = this.editingId
-      ? this.productService.update(this.editingId, payload)
-      : this.productService.create(payload);
+      ? this.productService.update(this.editingId, payload, this.selectedFile)
+      : this.productService.create(payload, this.selectedFile);
 
     request$.subscribe({
       next: () => {

@@ -103,7 +103,7 @@
           <div class="col">
             <div class="card h-100">
               <img
-                [src]="product.imagePrincipale || 'https://placehold.co/400x300?text=Produit'"
+                [src]="resolveImageUrl(product.imagePrincipale, 'https://placehold.co/400x300?text=Produit')"
                 class="card-img-top"
                 style="height: 180px; object-fit: cover;"
                 [alt]="product.nom"

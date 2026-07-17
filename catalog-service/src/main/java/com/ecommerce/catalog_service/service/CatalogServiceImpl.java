@@ -117,7 +117,11 @@ public class CatalogServiceImpl implements CatalogService {
         product.setDescription(productDetails.getDescription());
         product.setPrix(productDetails.getPrix());
         product.setStock(productDetails.getStock());
-        product.setImagePrincipale(productDetails.getImagePrincipale());
+        if (productDetails.getImagePrincipale() != null) {
+            // Le contrôleur ne renseigne ce champ que si une nouvelle image a été envoyée ;
+            // sinon on conserve l'image déjà stockée.
+            product.setImagePrincipale(productDetails.getImagePrincipale());
+        }
         product.setImagesSecondaires(productDetails.getImagesSecondaires());
         return productRepository.save(product);
     }

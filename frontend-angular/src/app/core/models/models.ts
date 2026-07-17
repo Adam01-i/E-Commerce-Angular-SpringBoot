@@ -96,8 +96,6 @@ export interface ProductWriteRequest {
   description?: string;
   prix: number;
   stock: number;
-  imagePrincipale?: string;
-  imagesSecondaires?: string;
   category: { id: number };
 }
 

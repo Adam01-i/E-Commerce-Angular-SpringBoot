@@ -11,6 +11,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-catalog:5432/catalogdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+    volumes:
+      - catalog_uploads:/app/uploads/produits
 
 
   postgres-catalog:
@@ -28,3 +30,4 @@ services:
 
 volumes:
   postgres_catalog_data:
+  catalog_uploads:

@@ -4,6 +4,7 @@ import com.ecommerce.catalog_service.dto.ProduitDisponibiliteDTO;
 import com.ecommerce.catalog_service.model.Product;
 import com.ecommerce.catalog_service.model.BulkPricing;
 import com.ecommerce.catalog_service.service.CatalogService;
+import com.ecommerce.catalog_service.service.ImageStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -11,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,6 +26,7 @@ import java.util.List;
 public class ProductController {
 
     private final CatalogService catalogService;
+    private final ImageStorageService imageStorageService;
 
     // ==========================================
     // SECTION : PRODUITS
@@ -66,16 +70,27 @@ public class ProductController {
         return ResponseEntity.ok(catalogService.filterProducts(categoryId, maxPrix, minStock, "ALL".equalsIgnoreCase(statut)));
     }
 
-    @PostMapping("/produits")
+    @PostMapping(value = "/produits", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Créer un produit (admin)")
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
+    public ResponseEntity<Product> createProduct(
+            @Valid @RequestPart("product") Product product,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+        if (image != null && !image.isEmpty()) {
+            product.setImagePrincipale(imageStorageService.store(image));
+        }
         return new ResponseEntity<>(catalogService.saveProduct(product), HttpStatus.CREATED); // 201
     }
 
-    @PutMapping("/produits/{id}")
+    @PutMapping(value = "/produits/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Modifier un produit (admin)")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestPart("product") Product product,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         try {
+            // Une nouvelle image remplace l'ancienne ; sans nouvel envoi, on ne touche pas
+            // à l'image déjà enregistrée (voir CatalogServiceImpl.updateProduct).
+            product.setImagePrincipale(image != null && !image.isEmpty() ? imageStorageService.store(image) : null);
             return ResponseEntity.ok(catalogService.updateProduct(id, product));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build(); // 404

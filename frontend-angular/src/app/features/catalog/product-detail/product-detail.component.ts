@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { Product } from '../../../core/models/models';
+import { resolveProductImageUrl } from '../../../core/utils/image-url';
 import { ProductService } from '../../../core/services/product.service';
 
 @Component({
@@ -14,6 +15,8 @@ import { ProductService } from '../../../core/services/product.service';
   templateUrl: './product-detail.component.html'
 })
 export class ProductDetailComponent implements OnInit {
+  resolveImageUrl = resolveProductImageUrl;
+
   product: Product | null = null;
   loading = true;
   quantite = 1;

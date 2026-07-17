@@ -41,8 +41,22 @@
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label">URL image</label>
-            <input class="form-control" formControlName="imagePrincipale" />
+            <label class="form-label">Image du produit</label>
+            <input
+              #fileInput
+              class="form-control"
+              type="file"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+            />
+            @if (existingImageUrl && !selectedFile) {
+              <img
+                [src]="resolveImageUrl(existingImageUrl, '')"
+                alt="Image actuelle"
+                class="mt-2 rounded"
+                style="max-height: 80px;"
+              />
+            }
           </div>
           <div class="d-flex gap-2">
             <button class="btn btn-primary" type="submit">

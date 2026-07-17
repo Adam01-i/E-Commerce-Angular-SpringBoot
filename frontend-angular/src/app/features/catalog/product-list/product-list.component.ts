@@ -6,6 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { Category, Page, Product } from '../../../core/models/models';
+import { resolveProductImageUrl } from '../../../core/utils/image-url';
 import { ProductService } from '../../../core/services/product.service';
 
 @Component({
@@ -15,6 +16,8 @@ import { ProductService } from '../../../core/services/product.service';
   templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
+  resolveImageUrl = resolveProductImageUrl;
+
   products: Product[] = [];
   categories: Category[] = [];
   loading = true;
